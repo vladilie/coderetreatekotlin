@@ -14,12 +14,10 @@ class AppTest {
     }
 
     @Test fun testWorldHasACell() {
-        val world= World(listOf(listOf(1)))
-        assertEquals(world.life(), emptyList())
+        val world= World(listOf(listOf(true)))
+        assertEquals(world.tick(), listOf(listOf(false)))
+        assertEquals(world.tick(), listOf(listOf(false)))
     }
 
-    @Test fun testWorldHas2Cells() {
-        val world= World(listOf(listOf(1)))
-        assertEquals(world.life(), listOf(listOf(1,1)))
-    }
+
 }

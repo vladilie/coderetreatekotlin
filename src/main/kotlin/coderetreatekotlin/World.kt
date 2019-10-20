@@ -3,39 +3,63 @@
  */
 package coderetreatekotlin
 
-class World(var geographicalMap: List<List<Int>>) {
+class World(var geographicalMap: List<List<Boolean>>) {
 
-    fun life() =
-        geographicalMap.mapIndexed{ row, list ->
-                list.mapIndexed { col, cell ->
-                    val liveNeighbours = countLiveNeighbours(row, col)
+    fun tick(): List<List<Boolean>> {
+        this.geographicalMap = life()
+        return this.geographicalMap
+    }
 
-                    if ((cell == 1 && liveNeighbours == 2) || liveNeighbours == 3) {
-                        1
-                    } else {
-                        0
-                    }
-                }
+    fun life() = geographicalMap.mapIndexed { row, list ->
+        list.mapIndexed { col, cell ->
+            next(cell, countLiveNeighbours(row, col))
         }
+    }
 
-    private fun countLiveNeighbours(row: Int, col: Int): Int   =
-                cellOf(row - 1, col - 1) + cellOf(row - 1, col) + cellOf(row - 1, col + 1) +
-                        cellOf(row, col - 1) + /*map[row][col]*/ +cellOf(row, col + 1) +
-                        cellOf(row + 1, col - 1) + cellOf(row + 1, col) + cellOf(row + 1, col + 1)
+    private fun next(cell: Boolean, noLiveNeighbours: Int) =
+            when (noLiveNeighbours) {
+                3 -> true
+                2 -> cell
+                else -> false
+            }
 
 
-    private fun cellOf(rowGetter: Int, colGetter: Int): Int = geographicalMap
-                .getOrElse(rowGetter) { emptyList<Int>() }
-                .getOrElse(colGetter) { 0 }
+    private fun countLiveNeighbours(row: Int, col: Int): Int =
+            cellOf(row - 1, col - 1) + cellOf(row - 1, col) + cellOf(row - 1, col + 1) +
+                    cellOf(row, col - 1) + /*map[row][col]*/ +cellOf(row, col + 1) +
+                    cellOf(row + 1, col - 1) + cellOf(row + 1, col) + cellOf(row + 1, col + 1)
 
+
+    private fun cellOf(rowGetter: Int, colGetter: Int) =
+            when (geographicalMap
+                    .getOrElse(rowGetter) { emptyList<Int>() }
+                    .getOrElse(colGetter) { false }) {
+                true -> 1
+                else -> 0
+            }
 }
 
-fun main(args: Array<String>) {
-    println(World(listOf(
-            listOf(0,0,0,0,0),
-            listOf(0,0,0,0,0),
-            listOf(0,1,1,1,0),
-            listOf(0,0,0,0,0),
-            listOf(0,0,0,0,0)
-            )).life())
+fun nicePrint(worldMap: List<List<Boolean>>) =
+        worldMap.forEach {
+            it.forEach {
+                when (it) {
+                    true -> print(" 1 ")
+                    else -> print(" 0 ")
+                }
+            }
+            println()
+        }
+
+fun main() {
+    val world = World(listOf(
+            listOf(false, false, false, false, false),
+            listOf(false, false, false, false, false),
+            listOf(false, true, true, true, false),
+            listOf(false, false, false, false, false),
+            listOf(false, false, false, false, false)
+    ))
+    (1..4).forEach {
+        nicePrint(world.tick())
+        println()
+    }
 }
